@@ -93,8 +93,27 @@ Modeling Rubisco's transition state accurately requires an active space spanning
 - Coordinating residues (carbamylated Lys201, His294, Asp203, Glu204)
 
 This yields an active space of at least **$(40e, 40o)$ to $(64e, 64o)$**:
-- A $(40e, 40o)$ active space contains over **$10^{22}$ Slater determinants**, exceeding the memory and compute capacity of any classical supercomputer.
-- A **Fault-Tolerant Quantum Computer** using Quantum Phase Estimation (QPE) scales **polynomially** ($\mathcal{O}(N^3\text{ to } N^4)$ with Tensor Hypercontraction), making this active space tractable and enabling the first first-principles calculation of Rubisco's selectivity barrier.
+- A $(40e, 40o)$ active space contains over **$1.90 \times 10^{22}$ Slater determinants**, demanding **$1.32 \times 10^5\text{ Exabytes}$ of classical RAM**—exceeding global physical memory.
+- A **Fault-Tolerant Quantum Computer** using Quantum Phase Estimation (QPE) scales **polynomially** ($\mathcal{O}(N^3\text{ to } N^4)$ with Tensor Hypercontraction), requiring **only 80 Logical Qubits**, making this active space tractable and enabling the first first-principles calculation of Rubisco's selectivity barrier.
+
+#### Benchmark Proof: Classical Scaling Wall vs. Quantum Requirements
+The benchmark script [`scripts/quantum_bottleneck_assessment.py`](scripts/quantum_bottleneck_assessment.py) quantifies this exact boundary:
+
+| Active Space | Physical Chemistry Scope | Slater Determinants | Classical Memory | Logical Qubits | Classical Feasibility |
+|:---|:---|:---:|:---:|:---:|:---|
+| **$(6e, 6o)$** | Minimal $\text{C2}=\text{C3}$ enediol | $400$ | $3.1\text{ KB}$ | 12 | Standard Laptop ($<1\text{ GB}$) |
+| **$(8e, 8o)$** | Enediol core | $4,900$ | $38.3\text{ KB}$ | 16 | Standard Laptop ($<1\text{ GB}$) |
+| **$(14e, 14o)$** | Enediol + $\text{O}_2\ \pi/\pi^*$ | $1.18 \times 10^7$ | $89.9\text{ MB}$ | 28 | Standard Laptop ($<1\text{ GB}$) |
+| **$(22e, 22o)$** | $+ \text{Mg}^{2+} \ \& \text{ Lys201}$ | $4.98 \times 10^{11}$ | $3.6\text{ TB}$ | 44 | HPC Cluster Node ($<1\text{ PB}$) |
+| **$(30e, 30o)$** | $+ \text{His294 } \& \text{ Asp203}$ | $2.41 \times 10^{16}$ | $171.0\text{ PB}$ | 60 | Global Supercomputer Limit |
+| **$(40e, 40o)$** | **Full Coordination Sphere (Target)** | **$1.90 \times 10^{22}$** | **$1.32 \times 10^5\text{ Exabytes}$** | **80** | **Mathematically Impossible Classically** |
+| **$(50e, 50o)$** | $+ \text{Second-shell residues}$ | $1.60 \times 10^{28}$ | $1.11 \times 10^{11}\text{ Exabytes}$ | 100 | **Mathematically Impossible Classically** |
+| **$(64e, 64o)$** | Extended active pocket | $3.36 \times 10^{36}$ | $2.33 \times 10^{19}\text{ Exabytes}$ | 128 | **Mathematically Impossible Classically** |
+
+<p align="center">
+  <img src="figures/quantum_bottleneck_proof.png" width="950" alt="Quantum Bottleneck Proof" /><br/>
+  <em><strong>Quantitative Proof of Quantum Requirement.</strong> (A) The biological selectivity gap between crop plants and elite red algae is only 0.35 kcal/mol, completely dwarfed by classical DFT uncertainty (±4 kcal/mol). (B) Classical Full CI state vector memory hits an impassable exponential wall at ~30 orbitals, reaching 132,000 Exabytes for Rubisco's coordination sphere. (C) On Fault-Tolerant Quantum Computing, the resource requirement scales strictly linearly (80 logical qubits), placing the simulation within reach of fault-tolerant QPE.</em>
+</p>
 
 ---
 
