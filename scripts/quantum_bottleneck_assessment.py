@@ -252,24 +252,37 @@ def generate_proof_figure(stats, scaling_data, output_path="figures/quantum_bott
     fci_mems_gb = [d["fci_mem_bytes"] / 1e9 for d in scaling_data]
     dmrg_mems_gb = [d["dmrg_mem_bytes"] / 1e9 for d in scaling_data]
 
-    ax2.plot(orbs, fci_mems_gb, marker="o", color="#D95F02", linewidth=2.5, markersize=8, label="Full CI State Vector Memory")
-    ax2.plot(orbs, dmrg_mems_gb, marker="^", color="#7570B3", linewidth=2.0, linestyle="--", markersize=7, label="Classical DMRG (3D Boundary Growth)")
+    # Plot Full CI up to No=50 so the line does not clip off ungracefully
+    plot_orbs = [d["No"] for d in scaling_data if d["No"] <= 50]
+    plot_fci = [d["fci_mem_bytes"] / 1e9 for d in scaling_data if d["No"] <= 50]
 
-    # Classical limits
+    ax2.plot(plot_orbs, plot_fci, marker="o", color="#D95F02", linewidth=2.5, markersize=8, label="Full CI State Vector Memory")
+    ax2.plot(orbs, dmrg_mems_gb, marker="^", color="#7570B3", linewidth=2.0, linestyle="--", markersize=7, label="DMRG State Tensor Memory (3D cluster)")
+
+    # Classical hardware limits
     ax2.axhline(64, color="blue", linestyle=":", linewidth=1.5, label="High-End Workstation (64 GB)")
     ax2.axhline(1e6, color="green", linestyle="--", linewidth=1.5, label="HPC Cluster Limit (1 Petabyte)")
     ax2.axhline(1e9, color="purple", linestyle="-.", linewidth=2, label="Global Supercomputer Limit (1 Exabyte)")
 
+    # Shaded classical intractable regime (No > 28)
+    ax2.axvspan(28, 66, color="red", alpha=0.08, label="Classical Impasse (No > 28)")
+
     # Highlight Rubisco Target (40e, 40o)
     target = [d for d in scaling_data if d["No"] == 40][0]
-    ax2.scatter([40], [target["fci_mem_bytes"] / 1e9], color="red", s=180, zorder=5, label="Rubisco Target (40e, 40o)")
+    target_mem_gb = target["fci_mem_bytes"] / 1e9
+    ax2.scatter([40], [target_mem_gb], color="red", s=180, zorder=5)
+    ax2.annotate("Rubisco Target (40e, 40o):\n1.32e+05 Exabytes\n(FCI Impossible;\nDMRG 3D Area Law Trap)",
+                 xy=(40, target_mem_gb), xytext=(22, 1e16),
+                 arrowprops=dict(facecolor="red", shrink=0.08, width=2, headwidth=8),
+                 fontsize=9.5, fontweight="bold", color="darkred")
 
     ax2.set_yscale("log")
     ax2.set_xlabel("Active Space Size ($N_{electrons} = N_{orbitals}$)", fontsize=13)
     ax2.set_ylabel("Memory Required (Gigabytes, log scale)", fontsize=13)
     ax2.set_title("(B) Classical Active Space Limits", fontsize=15, fontweight="bold")
-    ax2.set_ylim(1e-6, 1e20)
-    ax2.legend(loc="lower right", fontsize=9.5, frameon=True)
+    ax2.set_xlim(4, 52)
+    ax2.set_ylim(1e-6, 1e23)
+    ax2.legend(loc="lower right", fontsize=9, frameon=True)
     ax2.grid(True, linestyle=":", alpha=0.6)
 
     # --- Panel C: Fault-Tolerant Quantum Algorithm Complexity (THC-QPE) ---
